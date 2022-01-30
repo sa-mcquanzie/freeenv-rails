@@ -9,6 +9,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.0]
       t.string :name, null: false, default: ''
       t.string :refresh_token, null: false, default: ''
       t.string :uid, null: false, default: ''
+      t.string :username, null: false, default: ''
       t.datetime :remember_created_at
       t.timestamps null: false
     end

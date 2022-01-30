@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 2022_01_23_182319) do
     t.string "name", default: "", null: false
     t.string "refresh_token", default: "", null: false
     t.string "uid", default: "", null: false
+    t.string "username", default: "", null: false
     t.datetime "remember_created_at", precision: 6
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
