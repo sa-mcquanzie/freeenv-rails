@@ -280,8 +280,8 @@ Devise.setup do |config|
   #                 scope: 'read:jira-user'
 
   config.omniauth :bitbucket,
-                  ENV['BITBUCKET_CLIENT_KEY'],
-                  ENV['BITBUCKET_CLIENT_SECRET'],
+                  Rails.application.credentials.bitbucket.client_key,
+                  Rails.application.credentials.bitbucket.client_secret,
                   callback_url: 'http://localhost:3000/users/auth/bitbucket/callback',
                   scope: 'account repository'
 

@@ -48,13 +48,13 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
-# For Authentication with Devise and Omniauth
+# Authentication with Devise and Omniauth
 gem 'devise', github: 'heartcombo/devise', branch: 'main'
 gem 'omniauth-atlassian-bitbucket'
 gem 'omniauth-atlassian-oauth2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
-# For making HTTP requests
+# Make HTTP requests
 gem 'faraday'
 gem 'httpx'
 

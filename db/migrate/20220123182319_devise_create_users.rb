@@ -11,6 +11,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.0]
       t.string :uid, null: false, default: ''
       t.string :username, null: false, default: ''
       t.datetime :remember_created_at
+      t.datetime :token_expiration_time, null: false
       t.timestamps null: false
     end
 

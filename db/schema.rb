@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2022_01_23_182319) do
     t.string "uid", default: "", null: false
     t.string "username", default: "", null: false
     t.datetime "remember_created_at", precision: 6
+    t.datetime "token_expiration_time", precision: 6, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
