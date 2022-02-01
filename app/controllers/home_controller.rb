@@ -10,7 +10,7 @@ class HomeController < ApplicationController
   private
 
   def refresh_token_if_expired!
-    return unless DateTime.current.after?(current_user.token_expiration_time)
+    return unless current_user.token_expiration_time.past?
 
     current_user.refresh_token!
   end

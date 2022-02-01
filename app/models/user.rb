@@ -8,7 +8,7 @@ class User < ApplicationRecord
       user.email = auth['info']['email']
       user.name = auth['info']['name']
       user.refresh_token = auth['credentials']['refresh_token']
-      user.token_expiration_time = DateTime.now + auth['credentials']['expires_in'].to_i.seconds
+      user.token_expiration_time = Time.current + auth['credentials']['expires_in'].to_i.seconds
       user.username = auth['info']['username']
     end
   end
@@ -25,9 +25,9 @@ class User < ApplicationRecord
     )
 
     token_data = JSON.parse(response.body)
-
     self.access_token = token_data['access_token']
-    self.token_expiration_time = DateTime.now + token_data['expires_in'].to_i.seconds
+    self.token_expiration_time = Time.current + token_data['expires_in'].to_i.seconds
+    save
   end
 
   def repository(repo_name)
@@ -67,6 +67,6 @@ class User < ApplicationRecord
   end
 
   def time_now_plus_duration(duration)
-    Datetime.now + duration.seconds
+    Time.current + duration.seconds
   end
 end
