@@ -25,48 +25,10 @@ class User < ApplicationRecord
     )
 
     token_data = JSON.parse(response.body)
+
     self.access_token = token_data['access_token']
     self.token_expiration_time = Time.current + token_data['expires_in'].to_i.seconds
+    
     save
-  end
-
-  def repository(repo_name)
-    JSON.parse(
-      Faraday.get(
-        "https://api.bitbucket.org/2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}",
-        nil,
-        { 'Authorization': "Bearer #{access_token}" }
-      ).body
-    )
-  end
-
-  def branches(repo_name)
-    JSON.parse(
-      Faraday.get(
-        "https://api.bitbucket.org/2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/refs/branches",
-        nil,
-        { 'Authorization': "Bearer #{access_token}" }
-      ).body
-    )
-  end
-
-  def tagged_commit(repo_name, tag_name)
-    refresh_token!
-
-    JSON.parse(
-      Faraday.get(
-        "https://api.bitbucket.org/2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/refs/branches",
-        nil,
-        { 'Authorization': "Bearer #{access_token}" }
-      ).body
-    )
-  end
-
-  def workspaces
-    Faraday.get("https://api.bitbucket.org/2.0/workspaces/#{Rails.application.credentials.bitbucket.workspace_name}").body
-  end
-
-  def time_now_plus_duration(duration)
-    Time.current + duration.seconds
   end
 end

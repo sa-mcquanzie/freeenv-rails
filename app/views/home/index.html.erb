@@ -1,6 +1,5 @@
 <% if user_signed_in? %>
   <p>Logged in as <strong><%= current_user.username %></strong></p>
-  <p>Token expires at: <%= current_user.token_expiration_time %></p>
-  <% puts "token expiration time from index #{current_user.token_expiration_time}" %>
+  <p><%= @data %></p>
   <%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'navbar-link'  %>
 <% end %>
