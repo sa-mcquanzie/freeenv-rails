@@ -26,9 +26,9 @@ class User < ApplicationRecord
 
     token_data = JSON.parse(response.body)
 
-    self.access_token = token_data['access_token']
+    self.access_token = token_data['access_token'] || access_token
     self.token_expiration_time = Time.current + token_data['expires_in'].to_i.seconds
-    
+
     save
   end
 end
