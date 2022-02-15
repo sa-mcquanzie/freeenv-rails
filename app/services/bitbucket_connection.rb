@@ -7,71 +7,55 @@ class BitbucketConnection
       conn.authorization :Bearer, user.access_token
       conn.request :url_encoded
     end
-  end
 
-  def repository(repo_name)
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}"
-    )
-    JSON.parse(response.body)
-  end
-
-  def repositories
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}"
-    )
-    JSON.parse(response.body)
+    @repositories_path = "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}"
   end
 
   def branches(repo_name)
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/refs/branches"
-    )
-    # JSON.parse(response.body).to_h['values'].map { |branch| branch['name'] }
-    JSON.parse(response.body)
+    response = @connection.get("#{@repositories_path}/#{repo_name}/refs/branches")
+
+    JSON.parse(response.body).to_h['values']
   end
 
-  def tags(repo_name)
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/refs/tags"
-    )
-    # JSON.parse(response.body).to_h['values'].map { |branch| branch['name'] }
-    JSON.parse(response.body)
+  def repositories
+    response = @connection.get(@repositories_path)
+
+    JSON.parse(response.body).to_h['values'].map { |repo| repo['name'] }
   end
 
-  def commit(repo_name, commit_hash)
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/commit/#{commit_hash}"
-    )
-    # JSON.parse(response.body).to_h['values'].map { |branch| branch['name'] }
-    JSON.parse(response.body)
+  def tag_info(repo_name)
+    response = @connection.get("#{@repositories_path}/#{repo_name}/refs/tags")
+
+    response = JSON.parse(response.body)
+    
+    response['values'].map do |tag|
+      info = tagged_commit(repo_name, tag['name'])
+      branch = info[:branch]
+      commit = info[:hash]
+
+      {
+        name: tag['name'],
+        branch: branch,
+        commit: commit,
+        tagger: tag['tagger']['user']['display_name'],
+        date: DateTime.parse(tag['date']).strftime("%H:%M %m-%d-%Y")
+      }
+    end
+  end
+
+  def state
+    repositories.map { |repo| { name: repo, environment_tags: tag_info(repo) } }
   end
 
   def tagged_commit(repo_name, tag)
-    commits_response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/commits/#{tag}"
-    )
+    response = @connection.get("#{@repositories_path}/#{repo_name}/commits/#{tag}")
+    response_body = JSON.parse(response.body)
 
-    commits_response_body = JSON.parse(commits_response.body)
+    return nil if response_body['error']
 
-    return nil if commits_response_body['error']
+    commit_hash = response_body['values'].first['hash']
+    branch = branches(repo_name).select { |branch| branch['target']['hash'] == commit_hash }.first['name']
 
-    tagged_commit_hash = commits_response_body['values'].first['hash']
-
-    response = @connection.get(
-      "2.0/repositories/#{Rails.application.credentials.bitbucket.workspace_name}/#{repo_name}/refs/branches"
-    )
-
-    name = JSON.parse(response.body).to_h['values'].select { |branch| branch['target']['hash'] == tagged_commit_hash }.first['name']
-
-    name
-  end
-
-  def environment_tags(repo_name)
-    production_tag = tagged_commit(repo_name, 'production')
-    stagev2_tag = tagged_commit(repo_name, 'stagev2')
-    upgrade_tag = tagged_commit(repo_name, 'upgrade')
-
-    { production: production_tag, stagev2: stagev2_tag, upgrade: upgrade_tag }
+    return { hash: commit_hash, branch: branch }
   end
 end

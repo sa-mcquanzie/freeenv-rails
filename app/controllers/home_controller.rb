@@ -3,7 +3,7 @@ class HomeController < ApplicationController
   before_action :authenticate_user!, :refresh_token_if_expired!, :connect_to_bitbucket
 
   def index
-    @data = @bitbucket.tagged_commit('test-roh-repo', 'stagev2')
+    @workspace = @bitbucket.state
   end
 
   private

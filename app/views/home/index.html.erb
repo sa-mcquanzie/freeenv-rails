@@ -1,5 +1,10 @@
 <% if user_signed_in? %>
   <p>Logged in as <strong><%= current_user.username %></strong></p>
-  <p><%= @data %></p>
+  <% @workspace.each do |repo| %>
+    <h2><%= repo[:name] %></h2>
+    <% repo[:environment_tags].each do |tagged_env| %>
+    <p><%= tagged_env[:name] %> -- Commit <%= tagged_env[:commit][0..10] %> on branch <%= tagged_env[:branch] %>, tagged by <%= tagged_env[:tagger] %> at <%= tagged_env[:date] %></p>
+    <% end %>
+  <% end %>
   <%= link_to "Logout", destroy_user_session_path, method: :delete, :class => 'navbar-link'  %>
 <% end %>
